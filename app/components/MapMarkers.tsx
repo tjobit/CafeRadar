@@ -3,12 +3,13 @@
 import { LatLngTuple } from "leaflet";
 import { Marker, Popup } from "react-leaflet";
 import { CafeData } from "./CafeMapCore";
+import * as L from "leaflet";
 
-// Marqueur de café moderne avec animation
-export const createModernCoffeeIcon = (isSelected = false) => {
-  if (typeof window === "undefined") return null;
+export const createModernCoffeeIcon = (
+  isSelected = false
+): L.DivIcon | undefined => {
+  if (typeof window === "undefined") return undefined;
 
-  const L = require("leaflet");
   const size = isSelected ? 40 : 32;
   const color = isSelected ? "#3B82F6" : "#10B981";
 
@@ -35,11 +36,9 @@ export const createModernCoffeeIcon = (isSelected = false) => {
   });
 };
 
-// Marqueur de position utilisateur moderne
-export const createModernUserIcon = () => {
-  if (typeof window === "undefined") return null;
+export const createModernUserIcon = (): L.DivIcon | undefined => {
+  if (typeof window === "undefined") return undefined;
 
-  const L = require("leaflet");
   return L.divIcon({
     html: `
       <div style="

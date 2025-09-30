@@ -27,13 +27,6 @@ const CafeInfoPanel: React.FC<CafeInfoPanelProps> = ({ cafe, onClose }) => {
     window.open(url, "_blank");
   };
 
-  const getRatingColor = (rating: number) => {
-    if (rating >= 4.5) return "text-emerald-600 bg-emerald-50";
-    if (rating >= 4.0) return "text-blue-600 bg-blue-50";
-    if (rating >= 3.5) return "text-yellow-600 bg-yellow-50";
-    return "text-orange-600 bg-orange-50";
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 animate-fade-in">
       <div

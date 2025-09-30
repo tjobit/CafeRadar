@@ -2,6 +2,7 @@
 
 import "leaflet/dist/leaflet.css";
 import { LatLngTuple } from "leaflet";
+import * as L from "leaflet";
 import { MapContainer, TileLayer } from "react-leaflet";
 import { useState, useRef } from "react";
 import { LocationMarker, CafeMarker } from "./MapMarkers";
@@ -32,7 +33,7 @@ export default function CafeMapCore() {
   const [cafes, setCafes] = useState<CafeData[]>([]);
   const [selectedCafe, setSelectedCafe] = useState<CafeData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const mapRef = useRef<any>(null);
+  const mapRef = useRef<L.Map | null>(null);
 
   const fetchCafes = async () => {
     if (!mapRef.current) return;
