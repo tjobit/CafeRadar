@@ -3,13 +3,7 @@
 import "leaflet/dist/leaflet.css";
 import { LatLngTuple } from "leaflet";
 import { MapContainer, TileLayer } from "react-leaflet";
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  useMemo,
-} from "react";
+import { useState, useRef } from "react";
 import { LocationMarker, CafeMarker } from "./MapMarkers";
 import CafeHeader from "./CafeHeader";
 import CafeInfoPanel from "./CafeInfoPanel";
@@ -30,57 +24,7 @@ export type CafeData = {
   cuisine?: string;
 };
 
-// Composant mémorisé pour les items de café (optimisation de rendu)
-const CafeItem = React.memo(
-  ({
-    cafe,
-    onSelect,
-    onDetails,
-  }: {
-    cafe: CafeData;
-    onSelect: (cafe: CafeData) => void;
-    onDetails: (cafe: CafeData) => void;
-  }) => {
-    const handleSelect = useCallback(() => onSelect(cafe), [cafe, onSelect]);
-    const handleDetails = useCallback(() => onDetails(cafe), [cafe, onDetails]);
 
-    return (
-      <div className="p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-100 hover:border-blue-200">
-        <div onClick={handleSelect} className="cursor-pointer">
-          <h3 className="font-medium text-slate-900 mb-1 truncate">
-            {cafe.name}
-          </h3>
-          <p className="text-sm text-slate-600 mb-2 truncate">{cafe.address}</p>
-
-          <div className="flex items-center gap-2 text-xs mb-3">
-            {cafe.facilities.wifi && (
-              <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
-                📶 WiFi
-              </span>
-            )}
-            {cafe.facilities.outdoor_seating && (
-              <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full">
-                🌿 Terrasse
-              </span>
-            )}
-            {cafe.facilities.wheelchair && (
-              <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full">
-                ♿ Accessible
-              </span>
-            )}
-          </div>
-        </div>
-
-        <button
-          onClick={handleDetails}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-        >
-          Voir les détails
-        </button>
-      </div>
-    );
-  }
-);
 
 export default function CafeMapCore() {
   const [userLocation, setUserLocation] = useState<LatLngTuple | null>(null);
@@ -89,126 +33,58 @@ export default function CafeMapCore() {
   const [selectedCafe, setSelectedCafe] = useState<CafeData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const mapRef = useRef<any>(null);
-  const cacheRef = useRef<Map<string, { data: CafeData[]; timestamp: number }>>(
-    new Map()
-  );
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Cache duration: 5 minutes
-  const CACHE_DURATION = 5 * 60 * 1000;
-
-  const fetchCafes = useCallback(async () => {
+  const fetchCafes = async () => {
     if (!mapRef.current) return;
-
-    const mapBounds = mapRef.current.getBounds();
-    const boundsKey = `${mapBounds.getWest().toFixed(3)}-${mapBounds
-      .getSouth()
-      .toFixed(3)}-${mapBounds.getEast().toFixed(3)}-${mapBounds
-      .getNorth()
-      .toFixed(3)}`;
-
-    // Vérifier le cache
-    const cached = cacheRef.current.get(boundsKey);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      setCafes(cached.data);
-      return;
-    }
 
     setIsLoading(true);
     try {
+      const mapBounds = mapRef.current.getBounds();
       const bounds = `rect:${mapBounds.getWest()},${mapBounds.getSouth()},${mapBounds.getEast()},${mapBounds.getNorth()}`;
-
-      // Requête optimisée avec timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000);
-
+      
       const response = await fetch(
-        `https://api.geoapify.com/v2/places?categories=catering.cafe&filter=${bounds}&limit=50&format=json&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_API_KEY}`,
-        { signal: controller.signal }
+        `https://api.geoapify.com/v2/places?categories=catering.cafe&filter=${bounds}&limit=50&format=json&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_API_KEY}`
       );
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`);
-
+      
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      
       const result = await response.json();
 
-      const enrichedCafes =
-        result.features?.map((feature: any) => {
-          const props = feature.properties;
-          return {
-            id:
-              props.place_id ||
-              `cafe-${feature.geometry.coordinates[1]}-${feature.geometry.coordinates[0]}`,
-            name: props.name || "Café sans nom",
-            coordinates: [
-              feature.geometry.coordinates[1],
-              feature.geometry.coordinates[0],
-            ] as LatLngTuple,
-            address:
-              props.formatted ||
-              `${props.street || ""} ${props.city || ""}`.trim() ||
-              "Adresse non disponible",
-            opening_hours: props.opening_hours,
-            phone: props.contact?.phone,
-            website: props.website,
-            facilities: {
-              wifi: props.facilities?.internet_access || false,
-              wheelchair: props.facilities?.wheelchair || false,
-              outdoor_seating: props.facilities?.outdoor_seating || false,
-            },
-            cuisine: props.catering?.cuisine,
-          };
-        }) || [];
-
-      // Mettre en cache le résultat
-      cacheRef.current.set(boundsKey, {
-        data: enrichedCafes,
-        timestamp: Date.now(),
-      });
-
-      // Nettoyer le cache si il devient trop gros (plus de 10 entrées)
-      if (cacheRef.current.size > 10) {
-        const oldestKey = Array.from(cacheRef.current.keys())[0];
-        cacheRef.current.delete(oldestKey);
-      }
+      const enrichedCafes = result.features?.map((feature: any) => {
+        const props = feature.properties;
+        return {
+          id: props.place_id || `cafe-${feature.geometry.coordinates[1]}-${feature.geometry.coordinates[0]}`,
+          name: props.name || 'Unnamed Cafe',
+          coordinates: [
+            feature.geometry.coordinates[1],
+            feature.geometry.coordinates[0],
+          ] as LatLngTuple,
+          address: props.formatted || `${props.street || ""} ${props.city || ""}`.trim() || 'Address not available',
+          opening_hours: props.opening_hours,
+          phone: props.contact?.phone,
+          website: props.website,
+          facilities: {
+            wifi: props.facilities?.internet_access || false,
+            wheelchair: props.facilities?.wheelchair || false,
+            outdoor_seating: props.facilities?.outdoor_seating || false,
+          },
+          cuisine: props.catering?.cuisine,
+        };
+      }) || [];
 
       setCafes(enrichedCafes);
     } catch (error) {
-      if (error instanceof Error && error.name !== "AbortError") {
-        console.error("Erreur lors de la recherche de cafés:", error);
-      }
-      // En cas d'erreur, garder les anciens résultats si disponibles
+      console.error("Error searching for cafes:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [CACHE_DURATION]);
+  };
 
-  // Recherche avec debouncing pour éviter trop de requêtes
-  const debouncedFetchCafes = useCallback(() => {
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
-    debounceRef.current = setTimeout(() => {
-      fetchCafes();
-    }, 500); // Attendre 500ms après le dernier mouvement
-  }, [fetchCafes]);
 
-  // Recherche automatique au chargement avec un délai
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (mapRef.current) {
-        fetchCafes();
-      }
-    }, 1000); // Attendre 1 seconde après le chargement
-
-    return () => clearTimeout(timer);
-  }, [fetchCafes]);
 
   const handleGeolocationClick = () => {
     if (!navigator.geolocation) {
-      alert("Géolocalisation non supportée");
+      alert("Geolocation not supported");
       return;
     }
 
@@ -222,43 +98,25 @@ export default function CafeMapCore() {
         setMapCenter(location);
         mapRef.current?.flyTo(location, 13);
       },
-      () => alert("Impossible de vous localiser"),
+      () => alert("Unable to locate you"),
       { timeout: 10000 }
     );
   };
 
-  const handleCafeSelect = useCallback((cafe: CafeData) => {
-    // Seulement centrer la carte sur le café, sans ouvrir automatiquement les détails
+  const handleCafeSelect = (cafe: CafeData) => {
     mapRef.current?.flyTo(cafe.coordinates, 16);
-  }, []);
+  };
 
-  const handleCafeDetails = useCallback((cafe: CafeData) => {
+  const handleCafeDetails = (cafe: CafeData) => {
     setSelectedCafe(cafe);
-  }, []);
+  };
 
-  // Mémoriser la liste des cafés pour optimiser le rendu
-  const cafesList = useMemo(() => {
-    return cafes.slice(0, 20); // Limiter à 20 pour l'affichage (performance)
-  }, [cafes]);
 
-  // Mémoriser les marqueurs pour éviter les re-renders
-  const cafeMarkers = useMemo(() => {
-    return cafes.map((cafe) => (
-      <CafeMarker
-        key={cafe.id}
-        position={cafe.coordinates}
-        cafe={cafe}
-        isSelected={selectedCafe?.id === cafe.id}
-        onClick={() => handleCafeSelect(cafe)}
-        onDetailsClick={() => handleCafeDetails(cafe)}
-      />
-    ));
-  }, [cafes, selectedCafe?.id, handleCafeSelect, handleCafeDetails]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative">
       <CafeHeader
-        onSearchInArea={debouncedFetchCafes}
+        onSearchInArea={fetchCafes}
         onGeolocationClick={handleGeolocationClick}
         isLoading={isLoading}
       />
@@ -268,7 +126,7 @@ export default function CafeMapCore() {
         <div className="w-80 bg-white/80 backdrop-blur-sm border-r border-slate-200 overflow-y-auto">
           <div className="p-4">
             <h2 className="text-lg font-semibold text-slate-800 mb-3">
-              Cafés trouvés ({Math.min(cafes.length, 50)})
+              Cafes found ({Math.min(cafes.length, 50)})
               {cafes.length > 20 && (
                 <span className="text-sm font-normal text-slate-500 ml-2">
                   (max 50)
@@ -276,13 +134,48 @@ export default function CafeMapCore() {
               )}
             </h2>
             <div className="space-y-3">
-              {cafesList.map((cafe) => (
-                <CafeItem
+              {cafes.slice(0, 20).map((cafe) => (
+                <div
                   key={cafe.id}
-                  cafe={cafe}
-                  onSelect={handleCafeSelect}
-                  onDetails={handleCafeDetails}
-                />
+                  className="p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-slate-100 hover:border-blue-200"
+                >
+                  <div
+                    onClick={() => handleCafeSelect(cafe)}
+                    className="cursor-pointer"
+                  >
+                    <h3 className="font-medium text-slate-900 mb-1 truncate">
+                      {cafe.name}
+                    </h3>
+                    <p className="text-sm text-slate-600 mb-2 truncate">
+                      {cafe.address}
+                    </p>
+
+                    <div className="flex items-center gap-2 text-xs mb-3">
+                      {cafe.facilities.wifi && (
+                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+                          📶 WiFi
+                        </span>
+                      )}
+                      {cafe.facilities.outdoor_seating && (
+                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full">
+                          🌿 Terrace
+                        </span>
+                      )}
+                      {cafe.facilities.wheelchair && (
+                        <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full">
+                          ♿ Accessible
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleCafeDetails(cafe)}
+                    className="w-full bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    View details
+                  </button>
+                </div>
               ))}
             </div>
           </div>
@@ -309,7 +202,16 @@ export default function CafeMapCore() {
               setUserLocation={setUserLocation}
             />
 
-            {cafeMarkers}
+            {cafes.map((cafe) => (
+              <CafeMarker
+                key={cafe.id}
+                position={cafe.coordinates}
+                cafe={cafe}
+                isSelected={selectedCafe?.id === cafe.id}
+                onClick={() => handleCafeSelect(cafe)}
+                onDetailsClick={() => handleCafeDetails(cafe)}
+              />
+            ))}
           </MapContainer>
 
           {/* Panneau d'informations flottant */}
@@ -325,7 +227,7 @@ export default function CafeMapCore() {
             <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg px-4 py-2 shadow-lg z-10">
               <div className="flex items-center gap-2 text-slate-700">
                 <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-sm">Recherche en cours...</span>
+                <span className="text-sm">Searching...</span>
               </div>
             </div>
           )}

@@ -78,7 +78,7 @@ const CafeInfoPanel: React.FC<CafeInfoPanelProps> = ({ cafe, onClose }) => {
           {/* Heures d'ouverture */}
           {cafe.opening_hours && (
             <div>
-              <h3 className="font-medium text-slate-900 mb-2">Horaires</h3>
+              <h3 className="font-medium text-slate-900 mb-2">Hours</h3>
               <div className="text-sm text-slate-600">{cafe.opening_hours}</div>
             </div>
           )}
@@ -86,7 +86,7 @@ const CafeInfoPanel: React.FC<CafeInfoPanelProps> = ({ cafe, onClose }) => {
           {/* Équipements */}
           {cafe.facilities && (
             <div>
-              <h3 className="font-medium text-slate-900 mb-2">Équipements</h3>
+              <h3 className="font-medium text-slate-900 mb-2">Facilities</h3>
               <div className="flex flex-wrap gap-2">
                 {cafe.facilities.wifi && (
                   <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
@@ -95,7 +95,7 @@ const CafeInfoPanel: React.FC<CafeInfoPanelProps> = ({ cafe, onClose }) => {
                 )}
                 {cafe.facilities.outdoor_seating && (
                   <span className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm font-medium">
-                    🌿 Terrasse
+                    🌿 Terrace
                   </span>
                 )}
                 {cafe.facilities.wheelchair && (
@@ -131,7 +131,7 @@ const CafeInfoPanel: React.FC<CafeInfoPanelProps> = ({ cafe, onClose }) => {
                 </div>
                 <div className="text-left">
                   <div className="text-sm font-medium text-emerald-900">
-                    Appeler
+                    Call
                   </div>
                   <div className="text-sm text-emerald-700">{cafe.phone}</div>
                 </div>
@@ -160,10 +160,10 @@ const CafeInfoPanel: React.FC<CafeInfoPanelProps> = ({ cafe, onClose }) => {
                 </div>
                 <div className="text-left">
                   <div className="text-sm font-medium text-blue-900">
-                    Site web
+                    Website
                   </div>
                   <div className="text-sm text-blue-700 truncate">
-                    Visiter le site
+                    Visit website
                   </div>
                 </div>
               </button>
@@ -190,9 +190,9 @@ const CafeInfoPanel: React.FC<CafeInfoPanelProps> = ({ cafe, onClose }) => {
               </div>
               <div className="text-left">
                 <div className="text-sm font-medium text-indigo-900">
-                  Itinéraire
+                  Directions
                 </div>
-                <div className="text-sm text-indigo-700">Ouvrir dans Maps</div>
+                <div className="text-sm text-indigo-700">Open in Maps</div>
               </div>
             </button>
           </div>

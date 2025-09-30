@@ -23,7 +23,7 @@ export default function CafeHeader({
             <div>
               <h1 className="text-xl font-bold text-slate-900">Cafe Radar</h1>
               <p className="text-sm text-slate-600 hidden sm:block">
-                Découvrez les meilleurs cafés près de vous
+                Discover the best cafes near you
               </p>
             </div>
           </div>
@@ -39,12 +39,12 @@ export default function CafeHeader({
               {isLoading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span className="hidden sm:inline">Recherche...</span>
+                  <span className="hidden sm:inline">Searching...</span>
                 </>
               ) : (
                 <>
                   <span className="text-lg">🔍</span>
-                  <span className="hidden sm:inline">Chercher ici</span>
+                  <span className="hidden sm:inline">Search here</span>
                 </>
               )}
             </button>
@@ -55,7 +55,7 @@ export default function CafeHeader({
               style={{ transition: 'all 0.3s ease-out, transform 0.3s ease-out' }}
             >
               <span className="text-lg">📍</span>
-              <span className="hidden sm:inline">Ma position</span>
+              <span className="hidden sm:inline">My location</span>
             </button>
           </div>
         </div>
