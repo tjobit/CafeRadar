@@ -1,3 +1,9 @@
+import CafeMap from './components/CafeMap';
+
 export default function Home() {
-  return <div>Hello World !</div>;
+  return (
+    <div>
+      <CafeMap />
+    </div>
+  );
 }

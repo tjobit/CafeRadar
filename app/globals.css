@@ -67,6 +67,62 @@ body {
   color: var(--cream);
 }
 
+/* Classes pour les bordures */
+.border-coffee-light {
+  border-color: var(--light-coffee);
+}
+.border-coffee-medium {
+  border-color: var(--medium-coffee);
+}
+.border-coffee-dark {
+  border-color: var(--dark-coffee);
+}
+.border-caramel {
+  border-color: var(--caramel);
+}
+.border-chocolate {
+  border-color: var(--chocolate);
+}
+
+/* Classes pour les placeholders */
+.placeholder-coffee-medium::placeholder {
+  color: var(--medium-coffee);
+}
+.placeholder-coffee-light::placeholder {
+  color: var(--light-coffee);
+}
+
+/* Classes de gradient pour les boutons */
+.bg-gradient-caramel-chocolate {
+  background: linear-gradient(to right, var(--caramel), var(--chocolate));
+}
+.bg-gradient-chocolate-caramel {
+  background: linear-gradient(to right, var(--chocolate), var(--caramel));
+}
+.bg-gradient-medium-dark-coffee {
+  background: linear-gradient(to right, var(--medium-coffee), var(--dark-coffee));
+}
+.bg-gradient-dark-medium-coffee {
+  background: linear-gradient(to right, var(--dark-coffee), var(--medium-coffee));
+}
+.bg-gradient-cream-beige {
+  background: linear-gradient(to right, var(--cream), var(--warm-beige), var(--cream));
+}
+
+/* Focus states */
+.focus-caramel:focus {
+  border-color: var(--caramel);
+  outline: none;
+}
+
+/* Hover states pour boutons */
+.hover-chocolate-caramel:hover {
+  background: linear-gradient(to right, var(--chocolate), var(--caramel));
+}
+.hover-dark-medium-coffee:hover {
+  background: linear-gradient(to right, var(--dark-coffee), var(--medium-coffee));
+}
+
 /* Effets de survol chaleureux */
 .hover-warm:hover {
   background-color: var(--light-coffee);
@@ -76,4 +132,10 @@ body {
 
 .coffee-shadow {
   box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
+}
+
+.simple-marker {
+  background: none !important;
+  border: none !important;
+  text-align: center;
 }
