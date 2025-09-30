@@ -3,47 +3,63 @@
 interface CafeHeaderProps {
   onSearchInArea: () => void;
   onGeolocationClick: () => void;
+  isLoading?: boolean;
 }
 
 export default function CafeHeader({
   onSearchInArea,
   onGeolocationClick,
+  isLoading = false,
 }: CafeHeaderProps) {
   return (
-    <div className="bg-gradient-cream-beige border-b-2 border-coffee-light shadow-lg">
-      <div className="container mx-auto px-4 py-4">
-        {/* Logo et titre */}
-        <div className="flex items-center justify-center mb-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-caramel-chocolate rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-2xl">☕</span>
+    <header className="bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-sm sticky top-0 z-30">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex items-center justify-between">
+          {/* Logo et titre */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-md">
+              <span className="text-xl">☕</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-coffee-dark">Cafe Radar</h1>
-              <p className="text-sm text-coffee-medium">Trouvez les meilleurs cafés près de vous</p>
+              <h1 className="text-xl font-bold text-slate-900">Cafe Radar</h1>
+              <p className="text-sm text-slate-600 hidden sm:block">
+                Découvrez les meilleurs cafés près de vous
+              </p>
             </div>
           </div>
-        </div>
 
-        {/* Contrôles */}
-        <div className="flex flex-col md:flex-row gap-3 items-center justify-center">
-          <button
-            onClick={onSearchInArea}
-            className="px-6 py-3 bg-gradient-caramel-chocolate text-cream font-semibold rounded-xl hover-chocolate-caramel transition-all shadow-md flex items-center space-x-2"
-          >
-            <span className="text-lg">🔍</span>
-            <span className="text-cream">Chercher dans cette zone</span>
-          </button>
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onSearchInArea}
+              disabled={isLoading}
+              className="group px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-blue-300 disabled:to-blue-400 text-white font-medium rounded-xl transition-all duration-300 ease-out flex items-center gap-2 shadow-lg hover:shadow-xl scale-100 hover:scale-105 disabled:hover:scale-100 disabled:cursor-not-allowed cursor-pointer"
+              style={{ transition: 'all 0.3s ease-out, transform 0.3s ease-out' }}
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span className="hidden sm:inline">Recherche...</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-lg">🔍</span>
+                  <span className="hidden sm:inline">Chercher ici</span>
+                </>
+              )}
+            </button>
 
-          <button
-            onClick={onGeolocationClick}
-            className="px-6 py-3 bg-gradient-medium-dark-coffee text-cream font-semibold rounded-xl hover-dark-medium-coffee transition-all shadow-md flex items-center space-x-2"
-          >
-            <span className="text-lg">📍</span>
-            <span className="text-cream">Ma Position</span>
-          </button>
+            <button
+              onClick={onGeolocationClick}
+              className="group px-5 py-2.5 bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 text-white font-medium rounded-xl transition-all duration-300 ease-out flex items-center gap-2 shadow-lg hover:shadow-xl scale-100 hover:scale-105 cursor-pointer"
+              style={{ transition: 'all 0.3s ease-out, transform 0.3s ease-out' }}
+            >
+              <span className="text-lg">📍</span>
+              <span className="hidden sm:inline">Ma position</span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 }
