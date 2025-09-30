@@ -1,26 +1,79 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  /* Palette café chaleureuse et réconfortante */
+  --cream: #fdf6e3; /* Crème douce */
+  --warm-beige: #f4e4bc; /* Beige chaud */
+  --light-coffee: #d2b48c; /* Café au lait */
+  --medium-coffee: #8b4513; /* Café moyen */
+  --dark-coffee: #3c2415; /* Café foncé */
+  --espresso: #2f1b14; /* Espresso */
+  --caramel: #c8860d; /* Caramel doré */
+  --chocolate: #7b3f00; /* Chocolat */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Variables principales */
+  --background: var(--cream);
+  --foreground: var(--dark-coffee);
+  --accent: var(--caramel);
+  --secondary: var(--medium-coffee);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: linear-gradient(135deg, var(--cream) 0%, var(--warm-beige) 100%);
+  color: var(--dark-coffee);
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
+
+/* Styles utilitaires pour les couleurs café */
+.bg-coffee-light {
+  background-color: var(--light-coffee);
+}
+.bg-coffee-medium {
+  background-color: var(--medium-coffee);
+}
+.bg-coffee-dark {
+  background-color: var(--dark-coffee);
+}
+.bg-caramel {
+  background-color: var(--caramel);
+}
+.bg-chocolate {
+  background-color: var(--chocolate);
+}
+.bg-cream {
+  background-color: var(--cream);
+}
+.bg-warm-beige {
+  background-color: var(--warm-beige);
+}
+
+.text-coffee-light {
+  color: var(--light-coffee);
+}
+.text-coffee-medium {
+  color: var(--medium-coffee);
+}
+.text-coffee-dark {
+  color: var(--dark-coffee);
+}
+.text-caramel {
+  color: var(--caramel);
+}
+.text-chocolate {
+  color: var(--chocolate);
+}
+.text-cream {
+  color: var(--cream);
+}
+
+/* Effets de survol chaleureux */
+.hover-warm:hover {
+  background-color: var(--light-coffee);
+  color: var(--cream);
+  transition: all 0.3s ease;
+}
+
+.coffee-shadow {
+  box-shadow: 0 4px 12px rgba(139, 69, 19, 0.2);
 }
